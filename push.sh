@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO="Dzakiart19/Chat-Gateway"
+REPO="dugongyete-ui/Chat-GatewayV2"
 
 if [ -z "$GITHUB_TOKEN" ]; then
   echo "ERROR: GITHUB_TOKEN belum diset."

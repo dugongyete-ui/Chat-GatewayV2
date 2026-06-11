@@ -2122,17 +2122,22 @@ router.post("/chat/completions", requireApiKey, async (req, res) => {
   } catch (err) {
     logger.error({ err }, "v1/chat/completions error");
     const errMsg = err instanceof Error ? err.message : "Internal server error";
-    const isWaf = errMsg.includes("WAF") || errMsg.includes("QWEN_SESSION_TOKEN");
+    // Pass through meaningful provider errors instead of swallowing them
+    const isWaf      = errMsg.includes("WAF") || errMsg.includes("QWEN_SESSION_TOKEN");
+    const isProvider = errMsg.startsWith("Perplexity") || errMsg.startsWith("AlgoChat")
+                    || errMsg.startsWith("Kimi") || errMsg.startsWith("DeepSeek")
+                    || errMsg.startsWith("MiniMax") || errMsg.startsWith("GPTFree")
+                    || errMsg.startsWith("Opera") || errMsg.includes("authwall")
+                    || errMsg.includes("rate limit") || errMsg.includes("rate limited")
+                    || errMsg.includes("upstream");
+    const expose  = isWaf || isProvider;
+    const message = expose ? errMsg : "Internal server error";
+    const type    = isWaf ? "service_unavailable" : isProvider ? "upstream_error" : "server_error";
+    const code    = isWaf ? "qwen_waf_blocked"   : isProvider ? "provider_error"  : "internal_error";
     if (!res.headersSent) {
-      res.status(isWaf ? 503 : 500).json({
-        error: {
-          message: isWaf ? errMsg : "Internal server error",
-          type: isWaf ? "service_unavailable" : "server_error",
-          code: isWaf ? "qwen_waf_blocked" : "internal_error",
-        },
-      });
+      res.status(isWaf ? 503 : 500).json({ error: { message, type, code } });
     } else {
-      res.write(`data: ${JSON.stringify({ error: isWaf ? errMsg : "Internal server error" })}\n\ndata: [DONE]\n\n`);
+      res.write(`data: ${JSON.stringify({ error: message })}\n\ndata: [DONE]\n\n`);
       res.end();
     }
   }

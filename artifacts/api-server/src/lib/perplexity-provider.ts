@@ -90,10 +90,17 @@ interface PerplexitySSEMessage {
  * Parse Perplexity SSE response and extract text tokens in order.
  * Uses first-seen-wins per offset to avoid duplicate overwrites.
  * Throws on known Perplexity error codes.
+ *
+ * intended_usage values seen in the wild:
+ *   - "ask_text_0_markdown"  (classic format)
+ *   - "ask_text"             (newer format, also used in authwall responses)
+ * We prefer ask_text_0_markdown; fall back to ask_text.
  */
 function parsePerplexitySSE(raw: string): string {
-  let result = "";
+  let primary = "";
+  let fallback = "";
   const seenOffsets = new Set<number>();
+  let authwallHit = false;
 
   for (const line of raw.split("\n")) {
     if (!line.startsWith("data: ")) continue;
@@ -105,7 +112,13 @@ function parsePerplexitySSE(raw: string): string {
         error_code?: string;
         text?: string;
         status?: string;
+        upsell_information?: { upsell_type?: string };
       };
+
+      // Detect authwall — IP flagged, forced sign-up
+      if (msg.upsell_information?.upsell_type === "LOGIN") {
+        authwallHit = true;
+      }
 
       // Surface Perplexity error codes as explicit errors
       if (msg.error_code) {
@@ -122,20 +135,33 @@ function parsePerplexitySSE(raw: string): string {
       if (!msg.blocks) continue;
 
       for (const block of msg.blocks) {
-        // Only take the primary text block (ask_text mirrors it — skip to avoid dups)
-        if (block.intended_usage !== "ask_text_0_markdown") continue;
         if (!block.markdown_block?.chunks?.length) continue;
-
         const offset = block.markdown_block.chunk_starting_offset ?? 0;
-        if (seenOffsets.has(offset)) continue; // first-seen-wins: ignore re-sent chunks
-        seenOffsets.add(offset);
+        const text = block.markdown_block.chunks.join("");
 
-        result += block.markdown_block.chunks.join("");
+        if (block.intended_usage === "ask_text_0_markdown") {
+          if (!seenOffsets.has(offset)) {
+            seenOffsets.add(offset);
+            primary += text;
+          }
+        } else if (block.intended_usage === "ask_text") {
+          if (!seenOffsets.has(offset + 10_000_000)) {
+            seenOffsets.add(offset + 10_000_000);
+            fallback += text;
+          }
+        }
       }
     } catch (err) {
       // Re-throw Perplexity errors, skip parse errors
       if (err instanceof Error && err.message.startsWith("Perplexity")) throw err;
     }
+  }
+
+  const result = primary || fallback;
+
+  // Authwall: IP flagged — Perplexity is demanding login
+  if (authwallHit && (!result || result.toLowerCase().includes("sign up"))) {
+    throw new Error("Perplexity authwall: IP flagged, login required. Try again later or use a different IP.");
   }
 
   return result;

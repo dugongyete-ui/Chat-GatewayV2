@@ -1,6 +1,6 @@
 - [Opera Aria provider](aria-provider.md) — auth step 2 must have no User-Agent; Node.js fetch/https timeout to opera-api.com, use child_process curl instead.
 - [ChatGPT guest mode recon](chatgpt-recon.md) — sentinel 200 OK from datacenter, conversation 403 IP block; full provider implemented with PoW solver + Python curl_cffi subprocess.
-- [Perplexity provider](perplexity-provider.md) — guest API works via /rest/sse/perplexity_ask, only "turbo"/"default" model_preference work without auth; IP rate limit ~15-20 req/day, resets 00:00 UTC.
+- [Perplexity provider](perplexity-provider.md) — authwall (upsell_type=LOGIN) blocks flagged IPs; intended_usage changed ask_text_0_markdown→ask_text; parser updated to detect both + authwall error.
 - [GPTFree provider](gptfree-provider.md) — Firebase anonymous auth (no account), endpoint: us-central1-gptfree-2.cloudfunctions.net/agent_stream, payload: {message, images:[], history:[{type,content}]}, SSE event:result.
 - [AlgoChat provider](algochat-provider.md) — Gemini 3 Flash via algochat.app guest session; messages MUST have `parts:[{type,text}]` field or server 500s; Vercel AI SDK Data Stream format response.
 - [ChatAIBot Provider](chataibot-provider.md) — chataibot.pro promo-chat endpoint, no auth, 5 req/IP limit, models: Claude Haiku/Sonnet, DeepSeek R1, GPT-4.1-nano
