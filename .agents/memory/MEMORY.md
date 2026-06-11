@@ -6,4 +6,4 @@
 - [ChatAIBot Provider](chataibot-provider.md) — chataibot.pro promo-chat endpoint, no auth, 5 req/IP limit, models: Claude Haiku/Sonnet, DeepSeek R1, GPT-4.1-nano
 - [Kimi provider](kimi-provider.md) — Connect RPC binary framing required on BOTH request and response; body = 5-byte envelope + JSON; scenario "SCENARIO_K2"; requires KIMI_TOKEN (JWT from kimi-auth cookie).
 - [DeepSeek provider](deepseek-provider.md) — web scraping chat.deepseek.com; WASM PoW; createSession dual-format; SSE has 4 formats (A/B tested) — must extract from initial state fragments blob.
-- [Qwen WAF bypass](qwen-waf-bypass.md) — curl_cffi WITHOUT impersonation + Bearer token bypasses Aliyun WAF; implemented via qwen_cffi.py Python subprocess; model IDs changed in 2025.
+- [Qwen WAF bypass](qwen-waf-bypass.md) — curl_cffi (no impersonate) bypasses Aliyun WAF; guest mode via bx-umidtoken; fallback ladder: impersonate="chrome124" → tls-client → Playwright → residential proxy.
