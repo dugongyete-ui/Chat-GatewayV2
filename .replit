@@ -123,4 +123,5 @@ channel = "stable-25_05"
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "/nix/store/hkbylipx1iiawqdcjv858p501wv81bpm-bash-interactive-5.3p3/bin/bash $file"]
+run = ["bash", "-c", "PORT=5000 node --enable-source-maps ./artifacts/api-server/dist/index.mjs"]
+build = ["bash", "-c", "pnpm run build"]
