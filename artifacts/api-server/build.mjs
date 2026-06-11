@@ -4,13 +4,25 @@ import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
 import { rm, copyFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
 
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
 
+async function ensurePythonDeps() {
+  const reqFile = path.resolve(artifactDir, "requirements.txt");
+  try {
+    execFileSync("pip", ["install", "-r", reqFile, "-q", "--disable-pip-version-check"], { stdio: "inherit" });
+    console.log("python: requirements.txt installed");
+  } catch (err) {
+    console.warn("python: pip install failed (non-fatal):", err.message);
+  }
+}
+
 async function buildAll() {
+  await ensurePythonDeps();
   const distDir = path.resolve(artifactDir, "dist");
   await rm(distDir, { recursive: true, force: true });
 
