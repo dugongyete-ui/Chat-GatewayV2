@@ -1,0 +1,298 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Qwen API Gateway Wrapper
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: gateway
+    description: API gateway proxy operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /gateway/chat:
+    post:
+      operationId: keylessChat
+      tags: [gateway]
+      summary: Keyless Qwen chat (no token required)
+      description: Sends a chat message to Qwen AI without any API key or login using bx-umidtoken approach
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeylessChatInput"
+      responses:
+        "200":
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProxyResponse"
+
+  /gateway/proxy:
+    post:
+      operationId: proxyRequest
+      tags: [gateway]
+      summary: Raw proxy to Qwen API (token optional)
+      description: Forwards the request to chat.qwen.ai/api/v2 and returns the response. Token optional - falls back to keyless if not provided.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProxyRequestInput"
+      responses:
+        "200":
+          description: Proxy response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProxyResponse"
+
+  /gateway/history:
+    get:
+      operationId: getHistory
+      tags: [gateway]
+      summary: Get request/response history
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Max number of records to return
+      responses:
+        "200":
+          description: History list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEntry"
+    delete:
+      operationId: clearHistory
+      tags: [gateway]
+      summary: Clear all history
+      responses:
+        "200":
+          description: Cleared
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClearResult"
+
+  /gateway/stats:
+    get:
+      operationId: getStats
+      tags: [gateway]
+      summary: Get gateway statistics
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GatewayStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ToolDefinition:
+      type: object
+      properties:
+        type:
+          type: string
+        function:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            parameters:
+              type: object
+          required:
+            - name
+      required:
+        - type
+        - function
+
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: ["string", "null"]
+        name:
+          type: ["string", "null"]
+        tool_calls:
+          type: ["array", "null"]
+          items:
+            type: object
+        tool_call_id:
+          type: ["string", "null"]
+      required:
+        - role
+
+    KeylessChatInput:
+      type: object
+      properties:
+        model:
+          type: string
+          description: Qwen model ID (e.g. qwen3-235b-a22b, qwen3.7-max, qwen3-30b-a3b)
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+          description: Array of messages (OpenAI-compatible format)
+        prompt:
+          type: string
+          description: Raw prompt string (alternative to messages)
+        stream:
+          type: boolean
+          description: Whether to stream (currently always returns full response)
+      required:
+        - model
+
+    ProxyRequestInput:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Bearer token (optional - falls back to keyless if omitted)
+        endpoint:
+          type: string
+          description: The endpoint path to proxy to (e.g. chat/completions)
+        method:
+          type: string
+          description: HTTP method
+        payload:
+          type: object
+          description: The request body to forward
+        extraHeaders:
+          type: object
+          description: Additional headers to pass through
+      required:
+        - token
+        - endpoint
+        - method
+
+    ProxyResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        success:
+          type: boolean
+        statusCode:
+          type: integer
+        requestedAt:
+          type: string
+        responseTime:
+          type: integer
+        endpoint:
+          type: string
+        method:
+          type: string
+        requestPayload:
+          type: object
+        responseBody:
+          type: object
+        responseHeaders:
+          type: object
+        error:
+          type: ["string", "null"]
+      required:
+        - id
+        - success
+        - statusCode
+        - requestedAt
+        - responseTime
+        - endpoint
+        - method
+
+    HistoryEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        success:
+          type: boolean
+        statusCode:
+          type: integer
+        requestedAt:
+          type: string
+        responseTime:
+          type: integer
+        endpoint:
+          type: string
+        method:
+          type: string
+        requestPayload:
+          type: object
+        responseBody:
+          type: object
+        error:
+          type: ["string", "null"]
+      required:
+        - id
+        - success
+        - statusCode
+        - requestedAt
+        - responseTime
+        - endpoint
+        - method
+
+    GatewayStats:
+      type: object
+      properties:
+        totalRequests:
+          type: integer
+        successCount:
+          type: integer
+        failureCount:
+          type: integer
+        avgResponseTime:
+          type: integer
+        lastRequestAt:
+          type: ["string", "null"]
+      required:
+        - totalRequests
+        - successCount
+        - failureCount
+        - avgResponseTime
+        - lastRequestAt
+
+    ClearResult:
+      type: object
+      properties:
+        cleared:
+          type: integer
+      required:
+        - cleared

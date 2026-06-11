@@ -1,0 +1,54 @@
+name: Defang
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Whether to deploy up or down
+        required: true
+        default: up
+        type: choice
+        options:
+          - up
+          - down
+jobs:
+  defang:
+    name: Defang ${{ github.event.inputs.action || 'up' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      cancel-in-progress: false
+      group: deploy-chat-gateway
+    environment: defang-production
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set Defang Configs
+        uses: DefangLabs/defang-github-action@v2
+        with:
+          command: config set -e JWT_SECRET MONGODB_DATABASE MONGODB_URI
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+
+      - name: Defang ${{ github.event.inputs.action || 'up' }}
+        uses: DefangLabs/defang-github-action@v2
+        with:
+          command: ${{ github.event.inputs.action || 'up' }}
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - name: Deployment Summary
+        if: ${{ github.event.inputs.action != 'down' }}
+        uses: DefangLabs/defang-github-action@v2
+        with:
+          command: services

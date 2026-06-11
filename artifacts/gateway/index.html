@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+    <title>Dzeck API AI — OpenAI-Compatible Qwen Gateway</title>
+    <meta name="description" content="Dzeck API AI gives you OpenAI-compatible access to 8 Qwen AI models via a single API endpoint. Works with any OpenAI SDK. Supports streaming and large agentic payloads up to 50 MB." />
+    <meta name="keywords" content="Qwen API, OpenAI compatible API, AI API gateway, Qwen3, free AI API, LLM API, AI agent API" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Dzeck API AI" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="Dzeck API AI — OpenAI-Compatible Qwen Gateway" />
+    <meta property="og:description" content="OpenAI-compatible access to 8 Qwen AI models. Works with any OpenAI SDK, supports streaming and large agentic payloads." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Dzeck API AI" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dzeck API AI — OpenAI-Compatible Qwen Gateway" />
+    <meta name="twitter:description" content="OpenAI-compatible access to 8 Qwen AI models. Works with any OpenAI SDK, supports streaming and large agentic payloads." />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Dzeck API AI",
+      "description": "OpenAI-compatible AI API gateway providing access to 8 Qwen AI models with streaming support and large payload handling.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Dzeck API AI",
+      "description": "OpenAI-compatible Qwen AI gateway for developers and autonomous AI agents."
+    }
+    </script>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      (function () {
+        function showError(msg) {
+          var el = document.getElementById('root');
+          if (el) {
+            el.innerHTML =
+              '<div style="padding:24px;font-family:system-ui,sans-serif;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;margin:24px;white-space:pre-wrap;word-break:break-all">' +
+              '<strong>JS Error (screenshot &amp; report):</strong><br><br>' +
+              msg.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+          }
+        }
+        window.addEventListener('error', function (e) {
+          showError((e.message || 'Unknown error') + '\nFile: ' + (e.filename || '') + ' line ' + e.lineno);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e.reason;
+          showError('Unhandled rejection:\n' + (r && r.stack ? r.stack : String(r)));
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;color:#6b7280;font-size:14px">
+        Loading&hellip;
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

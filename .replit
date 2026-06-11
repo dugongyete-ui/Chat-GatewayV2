@@ -1,0 +1,127 @@
+modules = ["nodejs-20", "web", "bash", "python-3.11", "postgresql-16"]
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/mockup-sandbox: Component Preview Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/gateway: web"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/api-server: API Server"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm run build && PORT=5000 node --enable-source-maps ./artifacts/api-server/dist/index.mjs"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "artifacts/mockup-sandbox: Component Preview Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=3000 BASE_PATH=/ pnpm --filter @workspace/mockup-sandbox run dev"
+waitForPort = 3000
+
+[[workflows.workflow]]
+name = "artifacts/gateway: web"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5000 API_PORT=8080 BASE_PATH=/ pnpm --filter @workspace/gateway run dev"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "artifacts/api-server: API Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=8080 pnpm --filter @workspace/api-server run dev"
+waitForPort = 8080
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[ports]]
+localPort = 3000
+externalPort = 3002
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
+localPort = 8082
+externalPort = 3001
+
+[[ports]]
+localPort = 8083
+externalPort = 3003
+
+[[ports]]
+localPort = 24845
+externalPort = 3000
+
+[agent]
+expertMode = true
+stack = "BEST_EFFORT_FALLBACK"
+
+[userenv]
+
+[userenv.shared]
+MONGODB_DATABASE = "qwen_gateway"
+MONGODB_URI = "mongodb+srv://galerizaki_db_user:wTkfzrqewY5qCxYG@cluster0.vmiek8b.mongodb.net/manus?retryWrites=true&w=majority"
+JWT_SECRET = "qwen-gateway-jwt-secret-2026-secure-xK9mP2nQ"
+REDIS_HOST = "redis-14320.c334.asia-southeast2-1.gce.cloud.redislabs.com"
+REDIS_PORT = "14320"
+REDIS_PASSWORD = "dA82OZIdJg62zWqsPJ9sDNvgtpCKbAAs"
+POSTGRES_URL = "postgresql://neondb_owner:npg_WXBcMVP19yEg@ep-dark-haze-a4snvlq6-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+KIMI_TOKEN = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1c2VyLWNlbnRlciIsImV4cCI6MTc4MzE1MzY2OSwiaWF0IjoxNzgwNTYxNjY5LCJqdGkiOiJkOGdqZTFjcWRxZW1vNWs5bjJ2ZyIsInR5cCI6ImFjY2VzcyIsImFwcF9pZCI6ImtpbWkiLCJzdWIiOiJkNWI1ZmhmMDFxbWFnMzI4MWx1MCIsInNwYWNlX2lkIjoiZDViNWZoNzAxcW1hZzMyODFqdGciLCJhYnN0cmFjdF91c2VyX2lkIjoiZDViNWZoNzAxcW1hZzMyODFqdDAiLCJzc2lkIjoiMTczMTQ3NzkyNjA5Njc0NjA0NSIsImRldmljZV9pZCI6Ijc2MDczMTE2MjAxNzEyMjc2NTgiLCJyZWdpb24iOiJvdmVyc2VhcyIsIm1lbWJlcnNoaXAiOnsibGV2ZWwiOjEwfX0.ExFQn-kVQy1VaimlBcsaod15OWmMK2JySuUbVpfBFD37_ckMx1alEAdFjBBo_XjjkD-crOlf1I4NE_v7CpbOKg"
+MINIMAX_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODQwMjI2MzgsInVzZXIiOnsiaWQiOiI1MTg4NzkxMzA1MzIxMjY3MjgiLCJuYW1lIjoiRHplY2sgWUVURSIsImF2YXRhciI6Imh0dHBzOi8vY2RuLmhhaWx1b2FpLnZpZGVvL21vc3MvcHJvZC8yMDI2LTA2LTA0LTE3L3VzZXIvdXNlcl9hdmF0YXIvMTc4MDU2NjU2OTgyMzAzNDM4MC1hdmF0YXJfNTE4ODc5MTMwNTMyMTI2NzI4IiwiZGV2aWNlSUQiOiIiLCJpc0Fub255bW91cyI6ZmFsc2V9fQ.EP_88YpGyZw-qDwyvDKqFt9PvQiZ6aLgwT22UeGs__E"
+DEEPSEEK_TOKEN = "uAvxVNeVCcPX9DUqauQp6XoFVCtGdlR6QTjzCxWxdRC5bNrsh+Fac78bOeIY63KC"
+TELEGRAM_BOT_TOKEN = "8686866381:AAF9mvh5y3L2vqSc2jG4l2BOoYqNWwxToys"
+QWEN_SESSION_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZjODI5YWMwLTExMWYtNDVkNC04ZjY2LWI4NDRiNzgyNzkyNyIsImxhc3RfcGFzc3dvcmRfY2hhbmdlIjoxNzcyNjE5OTczLCJleHAiOjE3ODM3NjE5MzR9.27KiUUGTzVdgdqqCvXUbWIS7Rt6yWhTfzkNjvVSJt8A"
+
+[nix]
+channel = "stable-25_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["sh", "-c", "/nix/store/hkbylipx1iiawqdcjv858p501wv81bpm-bash-interactive-5.3p3/bin/bash $file"]

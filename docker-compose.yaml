@@ -1,0 +1,25 @@
+name: chat-gateway
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - mode: ingress
+        target: 8000
+    environment:
+      - MONGODB_URI
+      - MONGODB_DATABASE
+      - JWT_SECRET
+      - NODE_ENV=production
+      - PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        reservations:
+          memory: 512M
