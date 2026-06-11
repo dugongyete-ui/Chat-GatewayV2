@@ -24,9 +24,10 @@ const QWEN_BASE = `${QWEN_ORIGIN}/api/v2`;
 
 const QWEN_CFFI_PY = join(__dirname, "qwen_cffi.py");
 
-function qwenPyCreate(token: string, model: string): string {
+function qwenPyCreate(token: string, model: string, midtoken?: string): string {
+  const mid = midtoken ?? "";
   const out = execSync(
-    `python3 "${QWEN_CFFI_PY}" create "${token}" "${model}"`,
+    `python3 "${QWEN_CFFI_PY}" create "${token}" "${model}" "${mid}"`,
     { timeout: 15000, encoding: "utf8" },
   );
   checkQwenWaf(out);
@@ -36,10 +37,12 @@ function qwenPyCreate(token: string, model: string): string {
   return data.data.id;
 }
 
-function qwenPyBody(token: string, chatId: string, payload: unknown): Promise<string> {
+function qwenPyBody(token: string, chatId: string, payload: unknown, midtoken?: string): Promise<string> {
   const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64");
+  const args = [QWEN_CFFI_PY, "chat", token, chatId, payloadB64];
+  if (midtoken) args.push(midtoken);
   return new Promise<string>((resolve, reject) => {
-    const py = spawn("python3", [QWEN_CFFI_PY, "chat", token, chatId, payloadB64]);
+    const py = spawn("python3", args);
     const chunks: Buffer[] = [];
     py.stdout.on("data", (d: Buffer) => chunks.push(d));
     py.stderr.on("data", (d: Buffer) => logger.warn({ err: d.toString().trim() }, "qwen-cffi: stderr"));
@@ -94,19 +97,10 @@ function qwenCompletionsUrl(chatId: string): string {
   return `${QWEN_BASE}/chat/completions?chat_id=${chatId}`;
 }
 
-async function createQwenChat(headers: Record<string, string>, model: string): Promise<string> {
+async function createQwenChat(_headers: Record<string, string>, model: string, midtoken?: string): Promise<string> {
   const sessionToken = getQwenSessionToken();
   if (sessionToken) return qwenPyCreate(sessionToken, model);
-  const res = await fetch(`${QWEN_BASE}/chats/new`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ title: "New Chat", models: [model], chat_mode: "normal", chat_type: "t2t", timestamp: Date.now() }),
-  });
-  const text = await res.text();
-  checkQwenWaf(text);
-  const data = JSON.parse(text) as { success: boolean; data?: { id: string } };
-  if (!data.success || !data.data?.id) throw new Error(`createChat failed: ${JSON.stringify(data)}`);
-  return data.data.id;
+  return qwenPyCreate("", model, midtoken);
 }
 
 function parseQwenSSE(body: string): { content: string; inputTokens: number; outputTokens: number; upstreamError?: { message: string; code?: string } } {
@@ -555,7 +549,7 @@ async function describeImagesWithQwen(
     const files = await resolveImageUrls(imageUrls, uploadHeaders);
     if (files.length === 0) return userText;
 
-    const chatId = await createQwenChat(headers, "qwen3.7-max");
+    const chatId = await createQwenChat(headers, "qwen3.7-max", midtoken);
     const prompt = userText
       ? `${userText}\n\n(Analyze the attached image(s) carefully and answer based on their content.)`
       : "Describe the attached image(s) in full detail.";
@@ -1857,7 +1851,7 @@ router.post("/chat/completions", requireApiKey, async (req, res) => {
     }
 
     const chatApiModel = QWEN_API_MODEL_MAP[effectiveModel] ?? effectiveModel;
-    const chatId = await createQwenChat(headers, chatApiModel);
+    const chatId = await createQwenChat(headers, chatApiModel, midtoken);
 
     // Build the prompt; strip image notes when images are handled natively via files[]
     const userPrompt = messagesToPrompt(effectiveMessages, resolvedFiles.length > 0);
@@ -1885,9 +1879,7 @@ router.post("/chat/completions", requireApiKey, async (req, res) => {
     const getQwenBody = (): Promise<string> =>
       qwenToken
         ? qwenPyBody(qwenToken, chatId, qwenPayload)
-        : fetch(qwenCompletionsUrl(chatId), {
-            method: "POST", headers, body: JSON.stringify(qwenPayload),
-          }).then(r => r.text());
+        : qwenPyBody("", chatId, qwenPayload, midtoken);
 
     // ── STREAMING path ──────────────────────────────────────────────────────
     if (stream) {

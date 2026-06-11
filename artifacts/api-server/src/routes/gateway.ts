@@ -1,8 +1,40 @@
 import { Router } from "express";
 import { randomUUID } from "crypto";
+import { execSync, spawn } from "child_process";
+import { join } from "path";
 import { logger } from "../lib/logger";
 import { recordRequest, getHistory, clearHistory, getStats } from "../lib/stats";
 import { getPooledMidtoken, getPoolStatus } from "../lib/umid-pool";
+
+const QWEN_CFFI_PY = join(__dirname, "qwen_cffi.py");
+
+function qwenPyCreate(midtoken: string, model: string): string {
+  const out = execSync(
+    `python3 "${QWEN_CFFI_PY}" create "" "${model}" "${midtoken}"`,
+    { timeout: 15000, encoding: "utf8" },
+  );
+  const data = JSON.parse(out) as { success: boolean; data?: { id: string } };
+  if (!data.success || !data.data?.id)
+    throw new Error(`qwen: createChat failed: ${out.slice(0, 200)}`);
+  return data.data.id;
+}
+
+function qwenPyBody(midtoken: string, chatId: string, payload: unknown): Promise<string> {
+  const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64");
+  return new Promise<string>((resolve, reject) => {
+    const py = spawn("python3", [QWEN_CFFI_PY, "chat", "", chatId, payloadB64, midtoken]);
+    const chunks: Buffer[] = [];
+    py.stdout.on("data", (d: Buffer) => chunks.push(d));
+    py.stderr.on("data", (d: Buffer) => logger.warn({ err: d.toString().trim() }, "qwen-cffi: stderr"));
+    const timer = setTimeout(() => { py.kill(); reject(new Error("qwen-cffi: timeout")); }, 90000);
+    py.on("close", (code) => {
+      clearTimeout(timer);
+      if (code !== 0 && code !== 2) reject(new Error(`qwen-cffi: exit ${code}`));
+      else resolve(Buffer.concat(chunks).toString("utf8"));
+    });
+    py.on("error", reject);
+  });
+}
 
 const router = Router();
 
@@ -30,21 +62,8 @@ function qwenHeaders(midtoken: string): Record<string, string> {
   };
 }
 
-async function createQwenChat(headers: Record<string, string>, model: string): Promise<string> {
-  const res = await fetch(`${QWEN_BASE}/chats/new`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      title: "New Chat",
-      models: [model],
-      chat_mode: "normal",
-      chat_type: "t2t",
-      timestamp: Date.now(),
-    }),
-  });
-  const data = await res.json() as { success: boolean; data?: { id: string } };
-  if (!data.success || !data.data?.id) throw new Error(`Failed to create Qwen chat: ${JSON.stringify(data)}`);
-  return data.data.id;
+async function createQwenChat(midtoken: string, model: string): Promise<string> {
+  return qwenPyCreate(midtoken, model);
 }
 
 function parseQwenSSE(body: string): string {
@@ -120,47 +139,38 @@ router.post("/gateway/chat", async (req, res) => {
     const midtoken = await getMidtoken();
     const headers = qwenHeaders(midtoken);
 
-    // Step 1: create chat session
-    const chatId = await createQwenChat(headers, model);
+    // Step 1: create chat session via Python sidecar (WAF bypass)
+    const chatId = await createQwenChat(midtoken, model);
     req.log.info({ model, chatId }, "Qwen chat created");
 
-    // Step 2: send message
+    // Step 2: send message via Python sidecar (WAF bypass)
     const msgId = randomUUID();
-    const r2 = await fetch(`${QWEN_BASE}/chat/completions?chat_id=${chatId}`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        stream: true,
-        incremental_output: true,
-        chat_id: chatId,
-        chat_mode: "normal",
-        model,
-        parent_id: null,
-        messages: [{
-          fid: msgId,
-          parentId: null,
-          childrenIds: [],
-          role: "user",
-          content: userPrompt,
-          user_action: "chat",
-          files: [],
-          models: [model],
-          chat_type: "t2t",
-          feature_config: { thinking_enabled: false, output_schema: "phase", thinking_budget: 81920 },
-          sub_chat_type: "t2t",
-        }],
-      }),
-    });
+    const qwenPayload = {
+      stream: true,
+      incremental_output: true,
+      chat_id: chatId,
+      chat_mode: "normal",
+      model,
+      parent_id: null,
+      messages: [{
+        fid: msgId,
+        parentId: null,
+        childrenIds: [],
+        role: "user",
+        content: userPrompt,
+        user_action: "chat",
+        files: [],
+        models: [model],
+        chat_type: "t2t",
+        feature_config: { thinking_enabled: false, output_schema: "phase", thinking_budget: 81920 },
+        sub_chat_type: "t2t",
+      }],
+    };
 
-    r2.headers.forEach((v, k) => { responseHeaders[k] = v; });
-    const actualCode = r2.headers.get("x-actual-status-code");
-    statusCode = actualCode ? parseInt(actualCode, 10) : r2.status;
-
-    const body = await r2.text();
+    const body = await qwenPyBody(midtoken, chatId, qwenPayload);
     const answer = parseQwenSSE(body);
 
-    if (statusCode !== 200 && !answer) {
-      // try to parse as JSON error
+    if (!answer) {
       try {
         const errJson = JSON.parse(body) as { data?: { details?: string; code?: string } };
         error = errJson.data?.details ?? errJson.data?.code ?? "Unknown error";
@@ -168,11 +178,11 @@ router.post("/gateway/chat", async (req, res) => {
         error = body.slice(0, 200);
       }
       success = false;
+      statusCode = 502;
       responseBody = { error, raw: body.slice(0, 500) };
     } else {
       success = true;
       statusCode = 200;
-      // Return in OpenAI-compatible format
       responseBody = {
         id: `chatcmpl-${id}`,
         object: "chat.completion",
