@@ -7,20 +7,21 @@ import { Link } from "wouter";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const WORKING_MODELS = [
-  // ── Qwen (via chat.qwen.ai + session token WAF bypass) ──
-  { id: "qwen3.7-max",         label: "qwen3.7-max (terkuat)",                group: "Qwen" },
-  { id: "qwen3.7-plus",        label: "qwen3.7-plus",                          group: "Qwen" },
-  { id: "qwen3.5-397b-a17b",   label: "qwen3.5-397b-a17b (397B params!)",      group: "Qwen" },
-  { id: "qwen3.5-122b-a10b",   label: "qwen3.5-122b-a10b (122B)",              group: "Qwen" },
-  { id: "qwen3-coder-plus",    label: "qwen3-coder-plus (spesialis kode)",      group: "Qwen" },
-  { id: "qwen3.6-plus",        label: "qwen3.6-plus",                          group: "Qwen" },
-  { id: "qwen3.6-max-preview",  label: "qwen3.6-max-preview",                  group: "Qwen" },
-  { id: "qwen3.5-plus",        label: "qwen3.5-plus",                          group: "Qwen" },
-  { id: "qwen3.6-35b-a3b",     label: "qwen3.6-35b-a3b (MoE 35B)",            group: "Qwen" },
-  { id: "qwen3.6-27b",         label: "qwen3.6-27b (27B)",                     group: "Qwen" },
-  { id: "qwen3-235b-a22b",     label: "qwen3-235b-a22b (→ 235B-2507)",        group: "Qwen" },
-  { id: "qwen3-30b-a3b",       label: "qwen3-30b-a3b (→ 35B MoE)",            group: "Qwen" },
-  { id: "qwen3.5-flash",       label: "qwen3.5-flash (tercepat/ringan)",       group: "Qwen" },
+  // ── Qwen (via chat.qwen.ai — guest mode, tanpa login, curl_cffi WAF bypass) ──
+  // Semua model berikut diuji ✅ berjalan tanpa QWEN_SESSION_TOKEN (Juni 2026)
+  { id: "qwen3.7-plus",        label: "qwen3.7-plus ✦ (vision, search, thinking)",  group: "Qwen" },
+  { id: "qwen3.7-max",         label: "qwen3.7-max (flagship, text-only)",           group: "Qwen" },
+  { id: "qwen3.6-plus",        label: "qwen3.6-plus (vision, search, thinking)",     group: "Qwen" },
+  { id: "qwen3.6-max-preview", label: "qwen3.6-max-preview",                         group: "Qwen" },
+  { id: "qwen3.5-397b-a17b",   label: "qwen3.5-397b-a17b (397B params)",             group: "Qwen" },
+  { id: "qwen3.5-122b-a10b",   label: "qwen3.5-122b-a10b (122B)",                    group: "Qwen" },
+  { id: "qwen3.5-plus",        label: "qwen3.5-plus",                                group: "Qwen" },
+  { id: "qwen3-coder-plus",    label: "qwen3-coder-plus (spesialis kode)",            group: "Qwen" },
+  { id: "qwen3.6-35b-a3b",     label: "qwen3.6-35b-a3b (MoE 35B)",                  group: "Qwen" },
+  { id: "qwen3.6-27b",         label: "qwen3.6-27b (27B dense)",                     group: "Qwen" },
+  { id: "qwen3-235b-a22b",     label: "qwen3-235b-a22b (→ 235B-2507)",              group: "Qwen" },
+  { id: "qwen3-30b-a3b",       label: "qwen3-30b-a3b (→ 35B MoE)",                  group: "Qwen" },
+  { id: "qwen3.5-flash",       label: "qwen3.5-flash (tercepat/ringan)",             group: "Qwen" },
   { id: "minimax-m3",             label: "minimax-m3 (MiniMax M3 Thinking)",       group: "MiniMax" },
   { id: "minimax-m3-thinking",    label: "minimax-m3-thinking",                    group: "MiniMax" },
   { id: "minimax-m2.7",           label: "minimax-m2.7 (MiniMax M2.7)",            group: "MiniMax" },
@@ -368,7 +369,7 @@ function ImageGenerationsBlock({ apiKey }: { apiKey: string }) {
 
 export default function Playground() {
   const user = getUser();
-  const [model, setModel] = useState("qwen3-235b-a22b");
+  const [model, setModel] = useState("qwen3.7-plus");
   const [messages, setMessages] = useState(JSON.stringify([
     { role: "user", content: "Hello! What is 2 + 2?" }
   ], null, 2));
