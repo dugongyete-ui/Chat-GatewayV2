@@ -4,7 +4,8 @@ import { logger } from "./logger";
 
 export interface ChatMessage { role: string; content: string; }
 
-const BASE = "https://agent.minimax.io";
+const BASE_SESSION = "https://agent.minimax.io";
+const BASE_STREAM  = "https://agent-stream.minimax.io";
 const ARCHON = "/archon/api/v1";
 const SIGN_SALT = "I*7Cf%WZ#S&%1RlZJ&C2";
 
@@ -14,7 +15,7 @@ const DEFAULT_AGENT = "405559239626914";
 // Fixed device fingerprint validated by server
 const DEVICE = {
   uuid: "c451c3b9-3de8-4545-9ba9-72bbb241054f",
-  device_id: "23492706",
+  device_id: "99665887",
   user_id: "518879131345821696",
   timezone_offset: "25200",
   browser_language: "id-ID",
@@ -76,8 +77,8 @@ function commonHeaders(tsSec: number, body: string, token: string, accept = "app
     `-H "x-timestamp: ${tsSec}"`,
     `-H "Content-Type: application/json"`,
     `-H "Accept: ${accept}"`,
-    `-H "Origin: ${BASE}"`,
-    `-H "Referer: ${BASE}/"`,
+    `-H "Origin: ${BASE_SESSION}"`,
+    `-H "Referer: ${BASE_SESSION}/"`,
     `-H "User-Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36"`,
   ].join(" ");
 }
@@ -112,7 +113,7 @@ function createSession(token: string): string {
   const body = "{}";
   const agentName = getAgentName();
   const qs = buildQS(tsSec, token);
-  const url = `${BASE}${ARCHON}/agent/${agentName}/session?${qs}`;
+  const url = `${BASE_SESSION}${ARCHON}/agent/${agentName}/session?${qs}`;
   const headers = commonHeaders(tsSec, body, token);
 
   const raw = execSync(
@@ -135,7 +136,7 @@ function createSession(token: string): string {
 function sendMessage(sessionId: string, bodyStr: string, token: string): string {
   const tsSec = Math.floor(Date.now() / 1000);
   const qs = buildQS(tsSec, token);
-  const url = `${BASE}${ARCHON}/session/${sessionId}/message?${qs}`;
+  const url = `${BASE_STREAM}${ARCHON}/session/${sessionId}/message?${qs}`;
   const headers = commonHeaders(tsSec, bodyStr, token, "text/event-stream");
   const safeBody = bodyStr.replace(/'/g, "'\\''");
 
