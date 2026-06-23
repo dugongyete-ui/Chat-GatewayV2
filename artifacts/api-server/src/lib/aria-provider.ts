@@ -8,7 +8,7 @@ const UA_BROWSER = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML
 
 const TOKEN_EP  = "https://oauth2.opera-api.com/oauth2/v1/token/";
 const SIGNUP_EP = "https://auth.opera.com/account/v2/external/anonymous/signup";
-const CHAT_EP   = "https://composer.opera-api.com/api/v1/a-chat";
+const CHAT_EP   = "https://composer.opera-api.com/api/v2/a-chat";
 
 // ── curl helper ─────────────────────────────────────────────────────────────
 
