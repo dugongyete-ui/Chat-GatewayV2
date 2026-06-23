@@ -1,0 +1,26 @@
+POST /api/v2/chat/completions?chat_id=4a40f98a-178a-4f38-b41c-afd109e690c9 HTTP/1.1
+Host: chat.qwen.ai
+Connection: keep-alive
+Content-Length: 695
+sec-ch-ua: "Chromium";v="137", "Not/A)Brand";v="24"
+Version: 0.2.66
+Accept-Language: en-US,en;q=0.9
+source: h5
+sec-ch-ua-mobile: ?1
+User-Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36
+Content-Type: application/json
+Accept: application/json
+bx-v: 2.5.36
+Timezone: Tue Jun 23 2026 17:53:57 GMT+0700
+X-Accel-Buffering: no
+X-Request-Id: 3fb4e72b-f389-404f-994b-2aca617168cc
+sec-ch-ua-platform: "Android"
+Origin: https://chat.qwen.ai
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://chat.qwen.ai/c/4a40f98a-178a-4f38-b41c-afd109e690c9
+Accept-Encoding: gzip, deflate, br
+Cookie: cna=LLCfItNOKGwCAX2nev4zl55i; qwen-theme=dark; qwen-locale=en-US; _bl_uid=v0mUmp34qwp2h7iX81nw50abnOO0; cnaui=6c829ac0-111f-45d4-8f66-b844b7827927; aui=6c829ac0-111f-45d4-8f66-b844b7827927; xlly_s=1; acw_tc=0a03e58a17822119793493819e516e3c5ec82d74d00499d899c20876e1f926; x-ap=ap-southeast-5; sca=9226547a; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZjODI5YWMwLTExMWYtNDVkNC04ZjY2LWI4NDRiNzgyNzkyNyIsImxhc3RfcGFzc3dvcmRfY2hhbmdlIjoxNzcyNjE5OTczLCJleHAiOjE3ODQ4MDM5ODh9.kd9H0I5NdbvEe8QhV4EzZo2Oc-MfC6svq68bmrpAh4A; tfstk=gKJSS1NbaBM0zli-Jzo4fNozI96QPmkaykspjHezvTBRRkTeX6IzU0ABGe85yLWRJ9sAxFr8JbxRHrIkR_eKxaEvhesO2L--ZWsCYMEJaMFJDwsPe6AP8a7CdHYs0VkZQ3xlKT3Z7A5jWEofKwHFpjWYBiwlKVkZQ3LVPO5o7BPLdRjCv9IR9MExcGjQy9CRwSnfvMz898LpDm_cAgUR2gFvDgj_J9BpJnnfxZQdp_LpDmshkwK08us33wKSxGQ-eg2Zu3bbpJpfDm_MVTjcbKs5NTQ1lJI2hg15W3Jgw_-hfC9f_Qn-wZpkXBJdMkohKnR6RBLxTSYBX3pRO9HiAnBv6FvVdxqcyCA2yit4xStc9IJlsLuYFOdM4TRpkXPDWgo0QNwfVWNhyJIf7mibtWj9zopDkK0kb_Ic26ojc5iRwijf7mibtWfRmgGZcmNs2; isg=BG5ursfiiGMRZvwlCpnqBZ5rv8YwbzJpaGYnJJg3_HEsewfVA_5Meg89N7kymSqB; ssxmod_itna=1-eqIx0DRGDtit6xWqYjrqWKBKqiQG==Dw=D7KGHDy12xQ5DODLxn44GdecqdUIqOd3K7OxD8F70wo_eMxGXxrQxY=HRDmeD_QowY4qIFi7GvYeolerIKqQPg2T4einn1qnKQnQszNBhTGYSzkDX9TNTb4DIm4DyDAtD0qDiIDDgDA=Djkx9F0eD44DvDBAexAYoxDpNxi3D84DFmncoDG=EmOWNG8FDKRqOxBoDGM4KdabTx73o2xxDbEErxB6ExBj8XibL7Qm8W6aHs9ee4jCT/_xnNWjU3vQXQoquBQwYRYwzQhDZVRcz7Tq9vbKwoA9cR99SF=DqgITzK0TzR/RD4STel04WTqZxiiDhQDxfYG8uqlDrf7eiikYvD=rqITC8D3Nov9wbSydy4k/_xeD; ssxmod_itna2=1-eqIx0DRGDtit6xWqYjrqWKBKqiQG==Dw=D7KGHDy12xQ5DODLxn44GdecqdUIqOd3K7OxD8F70wo_e=xAopzFmExWeDFgB4LewtPDsRK7PhxL5Ds1Druel3twgYzdT0Q40_PTA1OSl6b5ruxYkBrYxyrwaRehOd74YehGopEcDKYFmyoIp78pNqbWe=Gp50amG_o3Ed7SvGbHeponbs80zUPyjf69p4FFezmyDzekKrmrUxNC2w=iAzCcW=8xrqnup78GkYljtrO4xWt/w/DWymriKYiDTKQze3rEDD; atpsida=1dc06276667e1668bfd7beb4_1782212037_3
+
+{"stream":true,"version":"2.1","incremental_output":true,"chat_id":"4a40f98a-178a-4f38-b41c-afd109e690c9","chat_mode":"normal","model":"qwen3.7-plus","parent_id":null,"messages":[{"fid":"96a8501a-6846-4d50-ab50-0f36c42c73d3","parentId":null,"childrenIds":["1aa2cde0-b8a1-4d8d-97c1-783aa1413f02"],"role":"user","content":"Hai ","user_action":"chat","files":[],"timestamp":1782212029,"models":["qwen3.7-plus"],"chat_type":"t2t","feature_config":{"thinking_enabled":true,"output_schema":"phase","research_mode":"normal","auto_thinking":true,"thinking_mode":"Auto","thinking_format":"summary","auto_search":true},"extra":{"meta":{"subChatType":"t2t"}},"sub_chat_type":"t2t"}],"timestamp":1782212037}

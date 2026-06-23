@@ -26,17 +26,27 @@ MAX_RETRIES = 3
 RETRY_DELAY = 3.0
 
 
+UA = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36"
+
 def _headers(token: str, midtoken: str = "") -> dict:
     h = {
-        "Content-Type":     "application/json",
-        "Origin":           ORIGIN,
-        "Referer":          f"{ORIGIN}/",
-        "X-Requested-With": "XMLHttpRequest",
-        "X-Source":         "web",
-        "bx-v":             "2.5.31",
+        "Accept":               "application/json",
+        "Accept-Language":      "en-US,en;q=0.9",
+        "Content-Type":         "application/json",
+        "Origin":               ORIGIN,
+        "Referer":              f"{ORIGIN}/",
+        "User-Agent":           UA,
+        "Version":              "0.2.66",
+        "source":               "h5",
+        "bx-v":                 "2.5.36",
+        "sec-ch-ua":            '"Chromium";v="137", "Not/A)Brand";v="24"',
+        "sec-ch-ua-mobile":     "?1",
+        "sec-ch-ua-platform":   '"Android"',
+        "X-Accel-Buffering":    "no",
     }
     if token:
         h["Authorization"] = f"Bearer {token}"
+        h["Cookie"] = f"token={token}"
     if midtoken:
         h["bx-umidtoken"] = midtoken
     return h
