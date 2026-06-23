@@ -49,8 +49,8 @@ function qwenPyBody(token: string, chatId: string, payload: unknown, midtoken?: 
     const timer = setTimeout(() => { py.kill(); reject(new Error("qwen-cffi: timeout")); }, 90000);
     py.on("close", (code) => {
       clearTimeout(timer);
-      // exit 2 = risk-control triggered; Python already wrote error SSE to stdout — resolve it.
-      if (code !== 0 && code !== 2) reject(new Error(`qwen-cffi: exit ${code}`));
+      // exit 2 = risk-control; exit 3 = WAF blocked — Python already wrote error SSE to stdout.
+      if (code !== 0 && code !== 2 && code !== 3) reject(new Error(`qwen-cffi: exit ${code}`));
       else resolve(Buffer.concat(chunks).toString("utf8"));
     });
     py.on("error", reject);
