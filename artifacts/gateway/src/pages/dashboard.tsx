@@ -151,11 +151,11 @@ export default function Dashboard() {
   const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
   const firstKey = newKey ?? keys[0];
   const codeSnippet = firstKey
-    ? `import OpenAI from "openai";\n\nconst client = new OpenAI({\n  apiKey: "${firstKey.key ?? maskKey(firstKey.prefix, firstKey.suffix)}",\n  baseURL: "https://${window.location.host}${BASE}/v1",\n});\n\nconst response = await client.chat.completions.create({\n  model: "qwen3-235b-a22b",\n  messages: [{ role: "user", content: "Hello!" }],\n});\nconsole.log(response.choices[0].message.content);`
+    ? `import OpenAI from "openai";\n\nconst client = new OpenAI({\n  apiKey: "${firstKey.key ?? maskKey(firstKey.prefix, firstKey.suffix)}",\n  baseURL: "https://${window.location.host}${BASE}/v1",\n});\n\nconst response = await client.chat.completions.create({\n  model: "command-a",\n  messages: [{ role: "user", content: "Hello!" }],\n});\nconsole.log(response.choices[0].message.content);`
     : `import OpenAI from "openai";\n\nconst client = new OpenAI({\n  apiKey: "sk-dzcx...",\n  baseURL: "https://${window.location.host}${BASE}/v1",\n});`;
 
   const curlSnippet = firstKey
-    ? `curl https://${window.location.host}${BASE}/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer ${firstKey.key ?? maskKey(firstKey.prefix, firstKey.suffix)}" \\\n  -d '{\n    "model": "qwen3-235b-a22b",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'`
+    ? `curl https://${window.location.host}${BASE}/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer ${firstKey.key ?? maskKey(firstKey.prefix, firstKey.suffix)}" \\\n  -d '{\n    "model": "command-a",\n    "messages": [{"role": "user", "content": "Hello!"}]\n  }'`
     : "";
 
   return (
@@ -312,7 +312,7 @@ export default function Dashboard() {
 
             <div className="bg-muted/60 border border-border rounded-lg p-4 space-y-1.5">
               <div className="font-semibold text-foreground text-xs uppercase tracking-wider mb-2">Available models</div>
-              {["qwen3.7-max","qwen3.6-plus","qwen3.6-max-preview","qwen3-235b-a22b","qwen3-30b-a3b","minimax-m3","minimax-m2.7","kimi-k2","command-a"].map(m => (
+              {["command-a","command-r-plus","aria","kimi-k2","kimi-search","gptfree-pro","algochat","yqcloud"].map(m => (
                 <div key={m} className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 shrink-0" />
                   <code className="text-xs font-mono text-foreground">{m}</code>

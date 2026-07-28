@@ -133,18 +133,6 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
 }
 
 buildAll()
-  .then(() =>
-    Promise.all([
-      copyFile(
-        path.resolve(artifactDir, "src/lib/sha3_wasm.wasm"),
-        path.resolve(artifactDir, "dist/sha3_wasm.wasm"),
-      ).then(() => console.log("deepseek: sha3_wasm.wasm copied to dist/")),
-      copyFile(
-        path.resolve(artifactDir, "src/lib/qwen_cffi.py"),
-        path.resolve(artifactDir, "dist/qwen_cffi.py"),
-      ).then(() => console.log("qwen: qwen_cffi.py copied to dist/")),
-    ])
-  )
   .catch((err) => {
     console.error(err);
     process.exit(1);

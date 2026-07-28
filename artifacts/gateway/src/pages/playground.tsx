@@ -7,25 +7,6 @@ import { Link } from "wouter";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const WORKING_MODELS = [
-  // ── Qwen (via chat.qwen.ai — guest mode, tanpa login, curl_cffi WAF bypass) ──
-  // Semua model berikut diuji ✅ berjalan tanpa QWEN_SESSION_TOKEN (Juni 2026)
-  { id: "qwen3.7-plus",        label: "qwen3.7-plus ✦ (vision, search, thinking)",  group: "Qwen" },
-  { id: "qwen3.7-max",         label: "qwen3.7-max (flagship, text-only)",           group: "Qwen" },
-  { id: "qwen3.6-plus",        label: "qwen3.6-plus (vision, search, thinking)",     group: "Qwen" },
-  { id: "qwen3.6-max-preview", label: "qwen3.6-max-preview",                         group: "Qwen" },
-  { id: "qwen3.5-397b-a17b",   label: "qwen3.5-397b-a17b (397B params)",             group: "Qwen" },
-  { id: "qwen3.5-122b-a10b",   label: "qwen3.5-122b-a10b (122B)",                    group: "Qwen" },
-  { id: "qwen3.5-plus",        label: "qwen3.5-plus",                                group: "Qwen" },
-  { id: "qwen3-coder-plus",    label: "qwen3-coder-plus (spesialis kode)",            group: "Qwen" },
-  { id: "qwen3.6-35b-a3b",     label: "qwen3.6-35b-a3b (MoE 35B)",                  group: "Qwen" },
-  { id: "qwen3.6-27b",         label: "qwen3.6-27b (27B dense)",                     group: "Qwen" },
-  { id: "qwen3-235b-a22b",     label: "qwen3-235b-a22b (→ 235B-2507)",              group: "Qwen" },
-  { id: "qwen3-30b-a3b",       label: "qwen3-30b-a3b (→ 35B MoE)",                  group: "Qwen" },
-  { id: "qwen3.5-flash",       label: "qwen3.5-flash (tercepat/ringan)",             group: "Qwen" },
-  { id: "minimax-m3",             label: "minimax-m3 (MiniMax M3 Thinking)",       group: "MiniMax" },
-  { id: "minimax-m3-thinking",    label: "minimax-m3-thinking",                    group: "MiniMax" },
-  { id: "minimax-m2.7",           label: "minimax-m2.7 (MiniMax M2.7)",            group: "MiniMax" },
-  { id: "minimax-m2.7-highspeed", label: "minimax-m2.7-highspeed (M2.7 HighSpeed)", group: "MiniMax" },
   // ── Opera Aria (unlimited via anonymous session) ──
   { id: "aria",             label: "aria (Opera Aria)", group: "Opera" },
   // ── Yqcloud (GPT-4 proxy, userId pool) ──
@@ -36,27 +17,16 @@ const WORKING_MODELS = [
   { id: "command-r-plus",   label: "command-r-plus", group: "Cohere" },
   { id: "command-r",        label: "command-r", group: "Cohere" },
   { id: "command-r7b",      label: "command-r7b", group: "Cohere" },
-  // ── Perplexity (no auth, web search AI, IP rate limit ~15 req/day) ──
-  { id: "perplexity",           label: "perplexity (turbo)", group: "Perplexity" },
   // ── GPTFree (Firebase anonymous auth, no account needed) ──
-  { id: "gptfree",              label: "gptfree (default)", group: "GPTFree" },
-  { id: "gptfree-pro",          label: "gptfree-pro", group: "GPTFree" },
+  { id: "gptfree",          label: "gptfree (default)", group: "GPTFree" },
+  { id: "gptfree-pro",      label: "gptfree-pro", group: "GPTFree" },
   // ── AlgoChat (Gemini 3 Flash Preview via algochat.app guest session) ──
   { id: "algochat",             label: "algochat (Gemini 3 Flash Preview)", group: "AlgoChat" },
   { id: "gemini-3-flash-preview", label: "gemini-3-flash-preview", group: "AlgoChat" },
-  // ── ChatAIBot (Claude/DeepSeek/GPT via chataibot.pro promo-chat, no auth) ──
-  { id: "chataibot-claude-haiku",  label: "chataibot-claude-haiku (Claude Haiku 4.5)",  group: "ChatAIBot" },
-  { id: "chataibot-claude-sonnet", label: "chataibot-claude-sonnet (Claude Sonnet 4.5)", group: "ChatAIBot" },
-  { id: "chataibot-deepseek-r1",   label: "chataibot-deepseek-r1 (DeepSeek R1)",         group: "ChatAIBot" },
-  { id: "chataibot-gpt4-nano",     label: "chataibot-gpt4-nano (GPT-4.1 nano)",          group: "ChatAIBot" },
-  // ── Kimi (Moonshot AI Kimi-K2 via Connect RPC, requires KIMI_TOKEN) ──────
-  { id: "kimi-k2",       label: "kimi-k2 (Moonshot Kimi K2)",           group: "Kimi" },
-  { id: "kimi-search",   label: "kimi-search (Kimi + Web Search)",       group: "Kimi" },
-  { id: "kimi-research", label: "kimi-research (Kimi Deep Research)",    group: "Kimi" },
-  // ── DeepSeek (web scraping via chat.deepseek.com, requires DEEPSEEK_TOKEN) ─
-  { id: "deepseek-chat",     label: "deepseek-chat (DeepSeek V3)",           group: "DeepSeek" },
-  { id: "deepseek-reasoner", label: "deepseek-reasoner (DeepSeek R1)",       group: "DeepSeek" },
-  { id: "deepseek-search",   label: "deepseek-search (DeepSeek V3 + Search)",group: "DeepSeek" },
+  // ── Kimi (Moonshot AI Kimi-K2 via Connect RPC) ──
+  { id: "kimi-k2",       label: "kimi-k2 (Moonshot Kimi K2)",        group: "Kimi" },
+  { id: "kimi-search",   label: "kimi-search (Kimi + Web Search)",    group: "Kimi" },
+  { id: "kimi-research", label: "kimi-research (Kimi Deep Research)", group: "Kimi" },
 ];
 
 const MODEL_GROUPS = [...new Set(WORKING_MODELS.map(m => m.group))];
@@ -369,7 +339,7 @@ function ImageGenerationsBlock({ apiKey }: { apiKey: string }) {
 
 export default function Playground() {
   const user = getUser();
-  const [model, setModel] = useState("qwen3.7-plus");
+  const [model, setModel] = useState("command-a");
   const [messages, setMessages] = useState(JSON.stringify([
     { role: "user", content: "Hello! What is 2 + 2?" }
   ], null, 2));

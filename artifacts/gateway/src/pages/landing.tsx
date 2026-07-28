@@ -7,17 +7,19 @@ import {
 } from "lucide-react";
 
 const MODELS = [
-  { id: "qwen3.7-max",                label: "Qwen3.7 Max",         badge: "Flagship"   },
-  { id: "qwen3.6-plus",               label: "Qwen3.6 Plus",        badge: "Multimodal" },
-  { id: "qwen3.6-max-preview",        label: "Qwen3.6 Max Preview", badge: "Preview"    },
-  { id: "qwen3-235b-a22b",            label: "Qwen3 235B-A22B",     badge: "235B"       },
-  { id: "qwen3-30b-a3b",              label: "Qwen3 30B-A3B",       badge: "Fast"       },
-  { id: "minimax-m3",                  label: "MiniMax M3",          badge: "Thinking"   },
+  { id: "command-a",            label: "Cohere Command A",      badge: "Flagship"  },
+  { id: "command-r-plus",       label: "Cohere Command R+",     badge: "Advanced"  },
+  { id: "aria",                 label: "Opera Aria",            badge: "OpenAI"    },
+  { id: "kimi-k2",              label: "Kimi K2",               badge: "Moonshot"  },
+  { id: "kimi-search",          label: "Kimi Search",           badge: "Web"       },
+  { id: "gptfree-pro",          label: "GPTFree Pro",           badge: "Free"      },
+  { id: "algochat",             label: "AlgoChat (Gemini)",     badge: "Google"    },
+  { id: "yqcloud",              label: "YQCloud GPT-4",         badge: "GPT-4"     },
 ];
 
 const FEATURES = [
   { icon: <Code2 size={16} />,    title: "OpenAI-Compatible API",  desc: "Drop-in replacement for OpenAI. Works with Python SDK, Node.js, LangChain, AutoGen, and more." },
-  { icon: <Layers size={16} />,   title: "8 Qwen Models",          desc: "From lightweight Turbo to the flagship 235B. One endpoint, all models, no SDK switching." },
+  { icon: <Layers size={16} />,   title: "8 AI Providers",         desc: "Cohere, Opera Aria, Kimi, GPTFree, AlgoChat, YQCloud — one endpoint, all models." },
   { icon: <Zap size={16} />,      title: "Smart Alias Routing",    desc: "Use familiar names like qwen-plus or qwen-max — automatically routed to the best available model." },
   { icon: <Shield size={16} />,   title: "API Key Auth",           desc: "Secure access with API keys. Create, revoke, and manage keys from your dashboard." },
   { icon: <Globe size={16} />,    title: "SSE Streaming",          desc: "Full server-sent events streaming for real-time token-by-token output in any application." },
@@ -27,7 +29,7 @@ const FEATURES = [
 const BADGES = [
   { icon: <Zap size={13} />,      label: "Automatic retries" },
   { icon: <Shield size={13} />,   label: "One API key" },
-  { icon: <Layers size={13} />,   label: "Qwen + Aria models" },
+  { icon: <Layers size={13} />,   label: "8 AI providers" },
   { icon: <Code2 size={13} />,    label: "OpenAI SDK compatible" },
   { icon: <Globe size={13} />,    label: "Streaming support" },
   { icon: <Terminal size={13} />, label: "50 MB payload limit" },
@@ -38,7 +40,7 @@ const mkCurl = (base: string) =>
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "model": "qwen3.7-max",
+    "model": "command-a",
     "messages": [
       {"role": "user", "content": "Hello!"}
     ]
@@ -53,7 +55,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="qwen3.7-max",
+    model="command-a",
     messages=[{"role": "user", "content": "Hello!"}]
 )
 print(response.choices[0].message.content)`;
@@ -67,7 +69,7 @@ const client = new OpenAI({
 });
 
 const response = await client.chat.completions.create({
-  model: "qwen3.7-max",
+  model: "command-a",
   messages: [{ role: "user", content: "Hello!" }],
 });
 console.log(response.choices[0].message.content);`;
@@ -138,7 +140,7 @@ export default function Landing() {
 
       {/* Announcement bar */}
       <div style={{ background: "rgba(255,255,255,0.03)", borderBottom: `1px solid ${BORDER}`, padding: "8px 16px", textAlign: "center", fontSize: "0.77rem", color: DIM }}>
-        Qwen + Opera Aria · OpenAI-compatible · Works with any SDK
+        Cohere · Aria · Kimi · GPTFree · AlgoChat · OpenAI-compatible
         <Link href="/register" style={{ marginLeft: 10, color: "rgba(255,255,255,0.65)", fontWeight: 600, textDecoration: "none" }}>Get started →</Link>
       </div>
 
@@ -190,7 +192,7 @@ export default function Landing() {
         <div style={{ position: "relative", maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: `1px solid ${BORDER}`, borderRadius: 99, padding: "6px 16px", marginBottom: 32, fontSize: "0.76rem", color: DIM }}>
             <Cpu size={12} style={{ opacity: 0.5 }} />
-            Now supporting Qwen + Opera Aria · OpenAI-compatible
+            8 AI providers · OpenAI-compatible · No API key needed
           </div>
 
           <h1 style={{ fontSize: "clamp(2.2rem,6vw,3.8rem)", fontWeight: 800, lineHeight: 1.08, letterSpacing: "-0.03em", marginBottom: 22, color: "#fff" }}>
@@ -199,7 +201,7 @@ export default function Landing() {
           </h1>
 
           <p style={{ fontSize: "1rem", color: DIM, lineHeight: 1.75, maxWidth: 460, margin: "0 auto 40px" }}>
-            One endpoint, all models — Qwen and Opera Aria. Switch instantly, no lock-in.
+            One endpoint, all models — Cohere, Aria, Kimi, GPTFree, and more. Switch instantly, no lock-in.
             Drop-in replacement for any OpenAI-compatible client.
           </p>
 
@@ -256,9 +258,9 @@ export default function Landing() {
         <div style={{ textAlign: "center", marginBottom: 44 }}>
           <h2 style={{ fontSize: "clamp(1.5rem,4vw,2.2rem)", fontWeight: 800, letterSpacing: "-0.025em", color: "#fff", marginBottom: 12 }}>Available Models</h2>
           <p style={{ color: DIM, fontSize: "0.9rem", maxWidth: 480, margin: "0 auto" }}>
-            All models via a single endpoint. Use exact IDs or common aliases like{" "}
-            <code style={{ color: "rgba(255,255,255,0.6)", fontFamily: "monospace" }}>qwen-max</code>,{" "}
-            <code style={{ color: "rgba(255,255,255,0.6)", fontFamily: "monospace" }}>qwen-plus</code>.
+            All models via a single endpoint. Use exact model IDs like{" "}
+            <code style={{ color: "rgba(255,255,255,0.6)", fontFamily: "monospace" }}>command-a</code>,{" "}
+            <code style={{ color: "rgba(255,255,255,0.6)", fontFamily: "monospace" }}>kimi-k2</code>.
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: 10 }}>
